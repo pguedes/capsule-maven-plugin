@@ -1,7 +1,9 @@
 capsule-maven-plugin
 ====================
 
-maven plugin to build java capsules
+maven plugin to build java capsules.
+
+Visit this page for more info on [capsule](https://github.com/puniverse/capsule).
 
 ## Building from source
 to build the project locally you will need to clone the git repo and install the plugin in your local repository
@@ -84,3 +86,8 @@ you can also attach the plugin goal to a maven lifecycle phase with the ```<exec
 you should then be able to build a capsule for your project by running:  
 
 ```mvn package```
+
+## License
+This project is licensed under the **GNU GPL v3**.  
+
+Read [the license](http://www.gnu.org/licenses/gpl.txt) or the [summarized version](https://tldrlegal.com/license/gnu-general-public-license-v3-(gpl-3)) .
