@@ -10,6 +10,8 @@ import java.util.zip.ZipEntry;
 
 /**
  * An object that knows how to write the capsule (jar) file.
+ *
+ * This class
  */
 public class CapsuleWriter {
     /**
