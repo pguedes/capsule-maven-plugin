@@ -5,14 +5,15 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.annotations.LifecyclePhase;
-import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
-import org.apache.maven.plugins.annotations.ResolutionScope;
+import org.apache.maven.plugins.annotations.*;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.repository.RemoteRepository;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Maven mojo for encapsulation of java apps in capsule - https://github.com/puniverse/capsule.
@@ -30,6 +31,13 @@ public class CapsuleMojo extends AbstractMojo {
     @Parameter(property = "capsule.mainJar", defaultValue = "${project.build.finalName}.jar")
     private String mainJar;
 
+    @Component
+    private RepositorySystem repoSystem;
+    @Parameter(defaultValue = "${repositorySystemSession}", readonly = true)
+    private RepositorySystemSession repoSession;
+    @Parameter(defaultValue = "${project.remoteProjectRepositories}", readonly = true)
+    private List<RemoteRepository> remoteRepos;
+
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         CapsuleWriter capsuleWriter = null;
@@ -38,14 +46,14 @@ public class CapsuleMojo extends AbstractMojo {
             File capsuleOutputPath = new File(outputDirectory, capsuleName);
             capsuleWriter = new CapsuleWriter(capsuleOutputPath);
             // add capsule classes to it
-            capsuleWriter.write(new TemplateCapsuleClass());
+            capsuleWriter.write(new TemplateCapsuleClass(repoSystem, repoSession, remoteRepos));
             // add the main jar for the application
             File mainJarFile = new File(outputDirectory, mainJar);
             capsuleWriter.write(new SingleFileEntry(mainJarFile));
             // add dependencies to the jar                                                                                                       <
             capsuleWriter.write(new MavenProjectDependencies(artifacts));
             // edit manifest to use capsule classes to load app
-            capsuleWriter.write(new CapsuleManifest(mainClass));
+            capsuleWriter.write(new CapsuleManifest(mainClass, capsuleName));
         } catch (IOException e) {
             throw new MojoExecutionException("failed to create capsule", e);
         } finally {

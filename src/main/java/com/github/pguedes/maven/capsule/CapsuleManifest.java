@@ -1,9 +1,6 @@
 package com.github.pguedes.maven.capsule;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.jar.Attributes;
@@ -13,13 +10,16 @@ import java.util.jar.Manifest;
 import static java.util.jar.Attributes.Name.MAIN_CLASS;
 
 public class CapsuleManifest implements Iterable<CapsuleEntry>, CapsuleEntry {
+    private static final Attributes.Name APPLICATION_NAME = new Attributes.Name("Application-Name");
     private static final Attributes.Name APPLICATION_CLASS = new Attributes.Name("Application-Class");
     private static final Attributes.Name BUILT_BY = new Attributes.Name("Built-By");
 
     private final String mainClass;
+    private final String mainJarFile;
 
-    public CapsuleManifest(String mainClass) {
+    public CapsuleManifest(String mainClass, String mainJarFile) {
         this.mainClass = mainClass;
+        this.mainJarFile = mainJarFile;
     }
 
     @Override
@@ -39,6 +39,7 @@ public class CapsuleManifest implements Iterable<CapsuleEntry>, CapsuleEntry {
         attributes.put(MAIN_CLASS, "Capsule");
         attributes.put(Attributes.Name.MANIFEST_VERSION, "1.0");
         attributes.put(BUILT_BY, "Maven Capsule plugin");
+        attributes.put(APPLICATION_NAME, mainJarFile.replaceAll("\\.jar$", ""));
         attributes.put(APPLICATION_CLASS, mainClass);
 
         // write to a temp byte array to conform to API
