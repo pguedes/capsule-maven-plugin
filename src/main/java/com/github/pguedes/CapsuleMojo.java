@@ -45,15 +45,15 @@ public class CapsuleMojo extends AbstractMojo {
             // create a new capsule (jar)
             File capsuleOutputPath = new File(outputDirectory, capsuleName);
             capsuleWriter = new CapsuleWriter(capsuleOutputPath);
+            // edit manifest to use capsule classes to load app
+            capsuleWriter.write(new CapsuleManifest(mainClass, capsuleName));
             // add capsule classes to it
-            capsuleWriter.write(new TemplateCapsuleClass(repoSystem, repoSession, remoteRepos));
+            capsuleWriter.write(new LatestCapsuleClass(repoSystem, repoSession, remoteRepos));
             // add the main jar for the application
             File mainJarFile = new File(outputDirectory, mainJar);
             capsuleWriter.write(new SingleFileEntry(mainJarFile));
             // add dependencies to the jar                                                                                                       <
             capsuleWriter.write(new MavenProjectDependencies(artifacts));
-            // edit manifest to use capsule classes to load app
-            capsuleWriter.write(new CapsuleManifest(mainClass, capsuleName));
         } catch (IOException e) {
             throw new MojoExecutionException("failed to create capsule", e);
         } finally {

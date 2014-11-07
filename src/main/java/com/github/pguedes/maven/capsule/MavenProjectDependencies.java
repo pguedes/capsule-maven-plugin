@@ -21,7 +21,6 @@ public class MavenProjectDependencies implements Iterable<CapsuleEntry> {
             File file = artifact.getFile();
             files.add(new FileCapsuleEntry(file));
         }
-        System.out.printf("deps: %s", artifacts);
         return files;
     }
 

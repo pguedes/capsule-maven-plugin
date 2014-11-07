@@ -47,7 +47,6 @@ public class CapsuleManifest implements Iterable<CapsuleEntry>, CapsuleEntry {
         manifest.write(dataStream);
         // return input stream based on byte array
         byte[] bytes = dataStream.toByteArray();
-        System.out.printf("\n\nbuilt manifest bytes: %d\n\n", bytes.length);
         return new ByteArrayInputStream(bytes);
     }
 }

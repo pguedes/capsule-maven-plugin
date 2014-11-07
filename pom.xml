@@ -120,22 +120,22 @@
           </execution>
         </executions>
       </plugin>
-      <!--<plugin>-->
-        <!--<groupId>org.apache.maven.plugins</groupId>-->
-        <!--<artifactId>maven-gpg-plugin</artifactId>-->
-        <!--<executions>-->
-          <!--<execution>-->
-            <!--<id>sign-artifacts</id>-->
-            <!--<phase>verify</phase>-->
-            <!--<goals>-->
-              <!--<goal>sign</goal>-->
-            <!--</goals>-->
-          <!--</execution>-->
-        <!--</executions>-->
-        <!--<configuration>-->
-          <!--<keyname>245997A6</keyname>-->
-        <!--</configuration>-->
-      <!--</plugin>-->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-gpg-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>sign-artifacts</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>sign</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <keyname>245997A6</keyname>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 </project>

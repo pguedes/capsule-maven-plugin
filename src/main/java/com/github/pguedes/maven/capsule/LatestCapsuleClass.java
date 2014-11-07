@@ -14,15 +14,19 @@ import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 
-public class TemplateCapsuleClass implements Iterable<CapsuleEntry>, CapsuleEntry {
+/**
+ * A {@link CapsuleEntry} that will look up the latest version of capsule in the maven repositories and write out the
+ * Capsule class file into the capsule jar.
+ */
+public class LatestCapsuleClass implements Iterable<CapsuleEntry>, CapsuleEntry {
     public static final String CAPSULE_CLASS = "Capsule.class";
 
     private final RepositorySystem repositorySystem;
     private final RepositorySystemSession repositorySystemSession;
     private final List<RemoteRepository> remoteRepositories;
 
-    public TemplateCapsuleClass(RepositorySystem repositorySystem, RepositorySystemSession repositorySystemSession,
-                                List<RemoteRepository> remoteRepositories) {
+    public LatestCapsuleClass(RepositorySystem repositorySystem, RepositorySystemSession repositorySystemSession,
+                              List<RemoteRepository> remoteRepositories) {
 
         this.repositorySystem = repositorySystem;
         this.repositorySystemSession = repositorySystemSession;
@@ -36,8 +40,7 @@ public class TemplateCapsuleClass implements Iterable<CapsuleEntry>, CapsuleEntr
 
     @Override
     public InputStream getInputStream() throws IOException {
-//        InputStream capsuleInputStream = getClass().getClassLoader().getResourceAsStream("capsule-0.4.0-SNAPSHOT.jar");
-        InputStream capsuleInputStream = new FileInputStream(resolveCapsule());
+        InputStream capsuleInputStream = new FileInputStream(resolveLatestCapsuleArtifact());
 
         JarInputStream capsuleJarInputStream = new JarInputStream(capsuleInputStream);
 
@@ -51,10 +54,21 @@ public class TemplateCapsuleClass implements Iterable<CapsuleEntry>, CapsuleEntr
         throw new IOException("unable to find Capsule.class entry in capsule project jar");
     }
 
-    private File resolveCapsule() throws IOException {
+    /**
+     * Get the {@link File} representing the jar of the capsule's latest artifact found in repositories.
+     * @return the file pointing to the latest version of the jar
+     * @throws IOException if we cannot find the latest version of the artifact
+     */
+    private File resolveLatestCapsuleArtifact() throws IOException {
         final ArtifactResult artifactResult;
         try {
-            artifactResult = this.resolve("co.paralleluniverse", "capsule", getLastCapsuleVersion());
+            final String version = getLatestCapsuleVersion();
+            String artifactRef = "co.paralleluniverse:capsule";
+            if (version != null && !version.isEmpty()){
+                artifactRef += ":" + version;
+            }
+            ArtifactRequest request = new ArtifactRequest(new DefaultArtifact(artifactRef), remoteRepositories, null);
+            artifactResult = repositorySystem.resolveArtifact(repositorySystemSession, request);
         } catch (ArtifactResolutionException e) {
             throw new IOException("Could not find the latest version of capsule in maven repositories");
         } catch (VersionRangeResolutionException e) {
@@ -63,17 +77,12 @@ public class TemplateCapsuleClass implements Iterable<CapsuleEntry>, CapsuleEntr
         return artifactResult.getArtifact().getFile();
     }
 
-    private ArtifactResult resolve(final String groupId, final String artifactId, final String version)
-            throws ArtifactResolutionException {
-
-        String coords = groupId + ":" + artifactId;
-        if (version != null && !version.isEmpty()){
-            coords += ":" + version;
-        }
-        return repositorySystem.resolveArtifact(repositorySystemSession, new ArtifactRequest(new DefaultArtifact(coords), remoteRepositories, null));
-    }
-
-    private String getLastCapsuleVersion() throws VersionRangeResolutionException {
+    /**
+     * Query the repositories to find the latest version of the capsule.
+     * @return latest version string found in repositories for capsule's artifact
+     * @throws VersionRangeResolutionException if we cannot resolve the latest version of capsule
+     */
+    private String getLatestCapsuleVersion() throws VersionRangeResolutionException {
         DefaultArtifact artifact = new DefaultArtifact("co.paralleluniverse", "capsule", null, null, "[0,)");
         VersionRangeRequest request = new VersionRangeRequest().setRepositories(remoteRepositories).setArtifact(artifact);
         final VersionRangeResult result = repositorySystem.resolveVersionRange(repositorySystemSession, request);
