@@ -78,7 +78,7 @@
     <dependency>
       <groupId>org.eclipse.aether</groupId>
       <artifactId>aether-api</artifactId>
-      <version>1.1.0</version>
+      <version>1.0.1.v20141111</version>
     </dependency>
   </dependencies>
 
