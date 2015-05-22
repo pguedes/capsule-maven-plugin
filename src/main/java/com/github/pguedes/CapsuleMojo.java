@@ -37,6 +37,8 @@ public class CapsuleMojo extends AbstractMojo {
     private RepositorySystemSession repoSession;
     @Parameter(defaultValue = "${project.remoteProjectRepositories}", readonly = true)
     private List<RemoteRepository> remoteRepos;
+    @Parameter(property = "capsule.version")
+    private String capsuleVersion;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -48,7 +50,7 @@ public class CapsuleMojo extends AbstractMojo {
             // edit manifest to use capsule classes to load app
             capsuleWriter.write(new CapsuleManifest(mainClass, capsuleName));
             // add capsule classes to it
-            capsuleWriter.write(new LatestCapsuleClass(repoSystem, repoSession, remoteRepos));
+            capsuleWriter.write(createCapsuleClassEntry());
             // add the main jar for the application
             File mainJarFile = new File(outputDirectory, mainJar);
             capsuleWriter.write(new SingleFileEntry(mainJarFile));
@@ -61,5 +63,12 @@ public class CapsuleMojo extends AbstractMojo {
                 capsuleWriter.close();
             }
         }
+    }
+
+    private AbstractCapsuleClassEntry createCapsuleClassEntry() {
+        if (capsuleVersion == null) {
+            return new LatestCapsuleClass(repoSystem, repoSession, remoteRepos);
+        }
+        return new SpecificCapsuleClass(repoSystem, repoSession, remoteRepos, capsuleVersion);
     }
 }
