@@ -36,7 +36,7 @@ public abstract class AbstractCapsuleClassEntry implements Iterable<CapsuleEntry
 
     @Override
     public InputStream getInputStream() throws IOException {
-        InputStream capsuleInputStream = new FileInputStream(resolveLatestCapsuleArtifact());
+        InputStream capsuleInputStream = new FileInputStream(resolveCapsuleArtifact());
 
         JarInputStream capsuleJarInputStream = new JarInputStream(capsuleInputStream);
 
@@ -55,7 +55,7 @@ public abstract class AbstractCapsuleClassEntry implements Iterable<CapsuleEntry
      * @return the file pointing to the latest version of the jar
      * @throws IOException if we cannot find the latest version of the artifact
      */
-    private File resolveLatestCapsuleArtifact() throws IOException {
+    private File resolveCapsuleArtifact() throws IOException {
         final ArtifactResult artifactResult;
         try {
             final String version = getCapsuleVersion();
