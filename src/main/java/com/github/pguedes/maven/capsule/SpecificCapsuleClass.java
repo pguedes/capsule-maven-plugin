@@ -1,4 +1,4 @@
-package com.github.pguedes;
+package com.github.pguedes.maven.capsule;
 
 import com.github.pguedes.maven.capsule.AbstractCapsuleClassEntry;
 import com.github.pguedes.maven.capsule.LatestCapsuleClass;
